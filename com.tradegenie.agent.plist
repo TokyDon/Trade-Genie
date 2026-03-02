@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Trade Genie - macOS LaunchAgent
+  ================================
+  This makes Trade Genie start automatically at login and restart
+  if it ever crashes.
+
+  INSTALL INSTRUCTIONS (run once on your iMac):
+  -----------------------------------------------
+  1. Edit the path below — replace /Users/YOUR_USERNAME with your actual home folder.
+     To find it, run: echo $HOME
+
+  2. Copy to LaunchAgents:
+     cp ~/Documents/Trade-Genie/com.tradegenie.agent.plist ~/Library/LaunchAgents/
+
+  3. Load it:
+     launchctl load ~/Library/LaunchAgents/com.tradegenie.agent.plist
+
+  4. Verify it started:
+     launchctl list | grep tradegenie
+
+  TO STOP IT:
+     launchctl unload ~/Library/LaunchAgents/com.tradegenie.agent.plist
+
+  TO RESTART AFTER A GIT PULL:
+     launchctl unload ~/Library/LaunchAgents/com.tradegenie.agent.plist
+     launchctl load ~/Library/LaunchAgents/com.tradegenie.agent.plist
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.tradegenie.agent</string>
+
+    <!-- Path to the start script — CHANGE YOUR_USERNAME -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/YOUR_USERNAME/Documents/Trade-Genie/start.sh</string>
+    </array>
+
+    <!-- Run at login -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Restart automatically if it crashes -->
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- Working directory — CHANGE YOUR_USERNAME -->
+    <key>WorkingDirectory</key>
+    <string>/Users/YOUR_USERNAME/Documents/Trade-Genie</string>
+
+    <!-- Log stdout/stderr — CHANGE YOUR_USERNAME -->
+    <key>StandardOutPath</key>
+    <string>/Users/YOUR_USERNAME/Documents/Trade-Genie/data/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/YOUR_USERNAME/Documents/Trade-Genie/data/launchd.err.log</string>
+
+    <!-- Throttle restarts (wait 30s before restarting after a crash) -->
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+</dict>
+</plist>
