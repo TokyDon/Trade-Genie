@@ -131,7 +131,7 @@ def build_html_report(result: EnsembleResult) -> str:
           </div>
           {''.join(f"""
           <div style="background:#f9fafb;padding:10px;border-radius:6px;margin-bottom:8px;font-size:13px;">
-            <strong>📍 {p.get('theme','')}</strong> ({p.get('time_horizon','')}, confidence: {p.get('confidence',0)}/10)<br>
+            <strong>&gt; {p.get('theme','')}</strong> ({p.get('time_horizon','')}, confidence: {p.get('confidence',0)}/10)<br>
             <em>{p.get('prediction','')}</em><br>
             <small style="color:#6b7280;">Why not priced in: {p.get('why_not_priced_in','')}</small>
           </div>
@@ -147,7 +147,7 @@ def build_html_report(result: EnsembleResult) -> str:
         )
         disc_html = f"""
         <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:16px;margin-bottom:20px;">
-          <h3 style="margin:0 0 10px 0;color:#92400e;">⚠️ Model Discrepancies</h3>
+          <h3 style="margin:0 0 10px 0;color:#92400e;">[!] Model Discrepancies</h3>
           <ul style="margin:0;padding-left:20px;font-size:13px;color:#78350f;">{items}</ul>
         </div>
         """
@@ -157,13 +157,13 @@ def build_html_report(result: EnsembleResult) -> str:
     if result.urgent_alerts:
         items = "".join(
             f'<div style="padding:8px;margin-bottom:6px;background:#fee2e2;border-radius:4px;'
-            f'font-size:13px;color:#991b1b;">🚨 {a}</div>'
+            f'font-size:13px;color:#991b1b;">[!!] {a}</div>'
             for a in result.urgent_alerts
         )
         alert_html = f"""
         <div style="background:#fef2f2;border:2px solid #f87171;border-radius:8px;
                     padding:16px;margin-bottom:20px;">
-          <h3 style="margin:0 0 10px 0;color:#dc2626;">🚨 Urgent Alerts</h3>
+          <h3 style="margin:0 0 10px 0;color:#dc2626;">[!!] Urgent Alerts</h3>
           {items}
         </div>
         """
@@ -236,7 +236,7 @@ def build_html_report(result: EnsembleResult) -> str:
   <!-- Top Picks -->
   <div style="margin-bottom:20px;">
     <h2 style="font-size:20px;color:#1f2937;margin-bottom:16px;">
-      🎯 Top {len(result.top_picks)} UK-Tradeable Picks
+      Top {len(result.top_picks)} UK-Tradeable Picks
     </h2>
     {picks_html}
   </div>
@@ -244,7 +244,7 @@ def build_html_report(result: EnsembleResult) -> str:
   <!-- Per-model analysis -->
   <div style="margin-bottom:20px;">
     <h2 style="font-size:20px;color:#1f2937;margin-bottom:16px;">
-      🔬 Per-Model Analysis
+      Per-Model Analysis
     </h2>
     {themes_html}
   </div>
@@ -279,7 +279,7 @@ def build_plain_text_report(result: EnsembleResult) -> str:
     ]
 
     if result.urgent_alerts:
-        lines.append("🚨 URGENT ALERTS")
+        lines.append("!! URGENT ALERTS")
         for alert in result.urgent_alerts:
             lines.append(f"  !! {alert}")
         lines.append("")
@@ -287,7 +287,7 @@ def build_plain_text_report(result: EnsembleResult) -> str:
     lines += ["EXECUTIVE SUMMARY", "-" * 40, result.consensus_summary, ""]
 
     if result.discrepancies:
-        lines += ["⚠️  MODEL DISCREPANCIES", "-" * 40]
+        lines += ["[!] MODEL DISCREPANCIES", "-" * 40]
         for d in result.discrepancies:
             lines.append(f"  • {d}")
         lines.append("")

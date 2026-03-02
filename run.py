@@ -51,28 +51,28 @@ def check_config():
     warnings = settings.validate()
     llms = settings.available_llms()
 
-    print(f"\n✅ LLM Providers configured: {', '.join(llms) if llms else 'NONE'}")
+    print(f"\n[OK] LLM Providers configured: {', '.join(llms) if llms else 'NONE'}")
     if not llms:
-        print("  ⚠  Add at least one LLM API key to .env to run analysis")
+        print("  [!] Add at least one LLM API key to .env to run analysis")
 
-    print(f"\n📧 Email: {'✅ Configured' if settings.GMAIL_ADDRESS and not settings.GMAIL_ADDRESS.startswith('your_') else '❌ Not configured'}")
-    print(f"📰 NewsAPI: {'✅ Configured' if settings.NEWS_API_KEY and not settings.NEWS_API_KEY.startswith('your_') else '❌ Not configured'}")
-    print(f"🤖 Reddit: {'✅ Configured' if settings.REDDIT_CLIENT_ID and not settings.REDDIT_CLIENT_ID.startswith('your_') else '❌ Not configured'}")
-    print(f"🐦 Twitter: {'✅ Configured' if settings.TWITTER_BEARER_TOKEN and not settings.TWITTER_BEARER_TOKEN.startswith('your_') else '⚪ Not configured (optional)'}")
-    print(f"📈 Alpha Vantage: {'✅ Configured' if settings.ALPHA_VANTAGE_API_KEY and not settings.ALPHA_VANTAGE_API_KEY.startswith('your_') else '❌ Not configured'}")
-    print(f"🌐 GDELT: ✅ No key required")
-    print(f"📡 RSS Feeds: ✅ {len(settings.RSS_FEEDS)} feeds configured")
+    print(f"\nEmail:         {'[OK] Configured' if settings.GMAIL_ADDRESS and not settings.GMAIL_ADDRESS.startswith('your_') else '[--] Not configured'}")
+    print(f"NewsAPI:       {'[OK] Configured' if settings.NEWS_API_KEY and not settings.NEWS_API_KEY.startswith('your_') else '[--] Not configured'}")
+    print(f"Reddit:        {'[OK] Configured' if settings.REDDIT_CLIENT_ID and not settings.REDDIT_CLIENT_ID.startswith('your_') else '[--] Not configured'}")
+    print(f"Twitter:       {'[OK] Configured' if settings.TWITTER_BEARER_TOKEN and not settings.TWITTER_BEARER_TOKEN.startswith('your_') else '[--] Not configured (optional)'}")
+    print(f"Alpha Vantage: {'[OK] Configured' if settings.ALPHA_VANTAGE_API_KEY and not settings.ALPHA_VANTAGE_API_KEY.startswith('your_') else '[--] Not configured'}")
+    print(f"GDELT:         [OK] No key required")
+    print(f"RSS Feeds:     [OK] {len(settings.RSS_FEEDS)} feeds configured")
 
     if warnings:
-        print(f"\n⚠  Warnings ({len(warnings)}):")
+        print(f"\n[!] Warnings ({len(warnings)}):")
         for w in warnings:
             print(f"   • {w}")
 
-    print(f"\n🌐 Web dashboard: http://localhost:{settings.WEB_PORT}")
-    print(f"⏰ Daily schedule: {settings.SCHEDULE_DAILY} UTC")
-    print(f"⏰ Weekly schedule: {settings.SCHEDULE_WEEKLY} UTC")
-    print(f"🚨 Urgency threshold: {settings.URGENCY_SCORE_THRESHOLD}/10")
-    print(f"📊 Top picks per report: {settings.TOP_PICKS_COUNT}")
+    print(f"\nWeb dashboard: http://localhost:{settings.WEB_PORT}")
+    print(f"Daily schedule:  {settings.SCHEDULE_DAILY} UTC")
+    print(f"Weekly schedule: {settings.SCHEDULE_WEEKLY} UTC")
+    print(f"Urgency threshold: {settings.URGENCY_SCORE_THRESHOLD}/10")
+    print(f"Top picks per report: {settings.TOP_PICKS_COUNT}")
     print()
 
 

@@ -39,7 +39,7 @@ def send_report_email(
         return False
 
     # Build subject line
-    urgency_emoji = "🚨" if result.consensus_confidence >= 8.5 else "📊"
+    urgency_emoji = "[!!]" if result.consensus_confidence >= 8.5 else "[>>]"
     picks_count = len(result.top_picks)
     subject = (
         f"{subject_prefix}{urgency_emoji} Trade Genie: {result.consensus_sentiment} "
@@ -94,5 +94,5 @@ def send_urgent_alert_email(
     return send_report_email(
         result,
         recipients=recipients,
-        subject_prefix="🚨 URGENT: ",
+        subject_prefix="[!!] URGENT: ",
     )
