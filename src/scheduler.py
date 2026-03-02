@@ -5,6 +5,9 @@ Also monitors for urgent events and triggers immediate alerts.
 """
 
 import logging
+import os
+import subprocess
+import sys
 from datetime import datetime
 from typing import Optional
 
@@ -134,6 +137,74 @@ def run_urgency_check():
         logger.error(f"Urgency check failed: {e}")
 
 
+def auto_update():
+    """
+    Pulls latest code from GitHub. If new commits are found:
+      1. Installs any new/updated requirements.
+      2. Restarts the process so the new code takes effect.
+    When running under launchd (KeepAlive=true), the restart is instant
+    and automatic — launchd relaunches the process immediately.
+    """
+    repo_dir = str(settings.ROOT_DIR)
+    logger.info("Auto-update: checking GitHub for new commits...")
+
+    try:
+        # Fetch without merging first so we can detect changes
+        subprocess.run(
+            ["git", "fetch", "origin", "main"],
+            cwd=repo_dir, capture_output=True, timeout=30, check=True
+        )
+
+        # Compare local HEAD to remote
+        local = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=repo_dir
+        ).strip()
+        remote = subprocess.check_output(
+            ["git", "rev-parse", "origin/main"], cwd=repo_dir
+        ).strip()
+
+        if local == remote:
+            logger.info("Auto-update: already up to date.")
+            return
+
+        logger.info(f"Auto-update: new commits found ({local[:7].decode()} → {remote[:7].decode()}). Pulling...")
+
+        # Pull the changes
+        pull_result = subprocess.run(
+            ["git", "pull", "origin", "main"],
+            cwd=repo_dir, capture_output=True, timeout=60
+        )
+        if pull_result.returncode != 0:
+            logger.error(f"Auto-update git pull failed: {pull_result.stderr.decode()}")
+            return
+
+        logger.info("Auto-update: pull successful. Installing any new requirements...")
+
+        # Re-install requirements in case new packages were added
+        pip_result = subprocess.run(
+            [sys.executable, "-m", "pip", "install", "-r",
+             os.path.join(repo_dir, "requirements.txt"), "-q"],
+            capture_output=True, timeout=120
+        )
+        if pip_result.returncode != 0:
+            logger.warning(f"Auto-update pip install warning: {pip_result.stderr.decode()}")
+
+        logger.info(
+            "Auto-update: complete. Restarting process to load new code...\n"
+            "(launchd will restart automatically if running as a service)"
+        )
+
+        # Replace current process with fresh copy — launchd sees it exit and restarts it
+        os.execv(sys.executable, [sys.executable] + sys.argv)
+
+    except subprocess.TimeoutExpired:
+        logger.error("Auto-update timed out — will retry next cycle.")
+    except FileNotFoundError:
+        logger.error("Auto-update: git not found in PATH. Skipping.")
+    except Exception as e:
+        logger.error(f"Auto-update failed: {e}")
+
+
 def start_scheduler():
     """Start the APScheduler background scheduler."""
     global _scheduler
@@ -190,6 +261,17 @@ def start_scheduler():
         replace_existing=True,
     )
     logger.info("Urgency check scheduled: every 3 hours")
+
+    # Auto-update from GitHub: every hour
+    _scheduler.add_job(
+        auto_update,
+        "interval",
+        hours=1,
+        id="auto_update",
+        name="GitHub Auto-Update",
+        replace_existing=True,
+    )
+    logger.info("Auto-update scheduled: every hour")
 
     _scheduler.start()
     logger.info("Scheduler started.")
