@@ -114,28 +114,40 @@ def build_html_report(result: EnsembleResult) -> str:
         themes = model_data.get("key_themes", [])
         preds = model_data.get("predictive_signals", [])
         sector_impacts = model_data.get("sector_impacts", [])
+
+        themes_chips = "".join(
+            f'<span style="background:#dbeafe;color:#1d4ed8;padding:3px 8px;'
+            f'border-radius:4px;font-size:13px;">{t}</span>'
+            for t in themes
+        )
+        preds_blocks = "".join(
+            f'<div style="background:#f9fafb;padding:10px;border-radius:6px;'
+            f'margin-bottom:8px;font-size:13px;">'
+            f'<strong>&gt; {p.get("theme","")}</strong>'
+            f' ({p.get("time_horizon","")}, confidence: {p.get("confidence",0)}/10)<br>'
+            f'<em>{p.get("prediction","")}</em><br>'
+            f'<small style="color:#6b7280;">Why not priced in: {p.get("why_not_priced_in","")}</small>'
+            f'</div>'
+            for p in preds[:3]
+        )
+        urgency_score = model_data.get("urgency_score", "?")
+        consensus_sentiment = model_data.get("consensus_sentiment", "?")
         themes_html += f"""
         <div style="border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-bottom:16px;">
           <h3 style="margin:0 0 12px 0;color:#1f2937;font-size:16px;">
-            🤖 {model_name.title()} Analysis
+            [{model_name.title()}] Analysis
             <span style="font-size:12px;color:#6b7280;font-weight:normal;margin-left:8px;">
-              Urgency: {model_data.get('urgency_score','?')}/10 | 
-              Sentiment: {model_data.get('consensus_sentiment','?')}
+              Urgency: {urgency_score}/10 |
+              Sentiment: {consensus_sentiment}
             </span>
           </h3>
           <div style="margin-bottom:10px;">
             <strong>Key Themes:</strong>
             <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
-              {''.join(f'<span style="background:#dbeafe;color:#1d4ed8;padding:3px 8px;border-radius:4px;font-size:13px;">{t}</span>' for t in themes)}
+              {themes_chips}
             </div>
           </div>
-          {''.join(f"""
-          <div style="background:#f9fafb;padding:10px;border-radius:6px;margin-bottom:8px;font-size:13px;">
-            <strong>&gt; {p.get('theme','')}</strong> ({p.get('time_horizon','')}, confidence: {p.get('confidence',0)}/10)<br>
-            <em>{p.get('prediction','')}</em><br>
-            <small style="color:#6b7280;">Why not priced in: {p.get('why_not_priced_in','')}</small>
-          </div>
-          """ for p in preds[:3])}
+          {preds_blocks}
         </div>
         """
 
